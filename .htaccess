@@ -1,0 +1,22 @@
+# Apache .htaccess for clean URLs (no .html extension)
+
+# Enable rewrite engine
+RewriteEngine On
+
+# Redirect old .html URLs to clean URLs (301 permanent redirects)
+RewriteCond %{THE_REQUEST} /([^.]+)\.html [NC]
+RewriteRule ^ /%1? [NC,L,R=301]
+
+# Rewrite clean URLs to serve .html files (internal rewrite, no redirect)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.html -f
+RewriteRule ^(.*)$ $1.html [L]
+
+# Handle root path - serve index.html
+DirectoryIndex index.html
+
+# Preserve query strings and fragments
+RewriteCond %{QUERY_STRING} .+
+RewriteRule ^(.*)$ $1? [QSA]
+
