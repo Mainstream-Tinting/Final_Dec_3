@@ -3226,19 +3226,8 @@
             // Nav Highlight (exclude logo link) - Use RAF for smooth updates
             Utils.safeRAF(() => {
                 try {
-                    // Get current path and normalize it (remove .html, handle root as empty or '/')
-                    let currentPath = (window.location.pathname || '').split("/").pop() || "";
-                    // Normalize: empty string or 'index.html' means root/homepage
-                    if (currentPath === "" || currentPath === "index.html") {
-                        currentPath = "/";
-                    } else {
-                        // Remove .html extension if present (for backward compatibility)
-                        currentPath = currentPath.replace(/\.html$/, "");
-                        currentPath = "/" + currentPath;
-                    }
-                    
-                    // Get all nav links (now using clean URLs without .html)
-                    const navLinks = Utils.safeQueryAll('nav a[href]');
+                    const currentPath = (window.location.pathname || '').split("/").pop() || "index.html";
+                    const navLinks = Utils.safeQueryAll('nav a[href$=".html"]');
 
                     // Optimized: Use for loop instead of forEach for better performance
                     // Batch DOM updates to prevent layout thrashing
@@ -3249,24 +3238,8 @@
                             const logoImg = Utils.safeQuery('img[alt*="Logo"]', link);
                             if (logoImg) continue;
 
-                            let linkPath = link.getAttribute("href");
-                            // Remove hash/anchor from link path for comparison
-                            if (linkPath.includes("#")) {
-                                linkPath = linkPath.split("#")[0];
-                            }
-                            // Normalize link path
-                            if (linkPath === "" || linkPath === "/" || linkPath === "index.html" || linkPath === "/index.html") {
-                                linkPath = "/";
-                            } else if (!linkPath.startsWith("/")) {
-                                // Handle relative paths
-                                linkPath = "/" + linkPath.replace(/\.html$/, "");
-                            } else {
-                                // Remove .html extension if present
-                                linkPath = linkPath.replace(/\.html$/, "");
-                            }
-                            
-                            // Compare normalized paths
-                            if (linkPath === currentPath) {
+                            const linkPath = link.getAttribute("href");
+                            if (linkPath === currentPath || (currentPath === "index.html" && linkPath === "index.html")) {
                                 updates.push(() => {
                                     link.classList.add("text-[#FF4081]", "nav-active");
                                     link.classList.remove("text-gray-100");
